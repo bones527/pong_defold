@@ -1,0 +1,55 @@
+local speed = 150
+local default_pos = vmath.vector3(320, 240, 1)
+local window_x, window_y = window.get_size()
+
+
+function init(self)
+	self.dir = vmath.vector3(1, 1, 0)
+end
+
+local function move_ball(self, dt)
+	local pos = go.get_position()
+	pos = pos + self.dir * speed * dt
+	go.set_position(pos)
+end
+
+local function reset_position()
+	go.set_position(default_pos)
+	speed = 150
+end
+
+local function change_direction(self)
+	local pos = go.get_position()
+	if pos.x + 8 >= window_x then
+		reset_position()
+		-- p1 point
+		msg.post("/hud#hud", "add_score", {player = 1})
+	elseif pos.x - 8 <= 0 then
+		reset_position()
+		-- p2 point
+		msg.post("/hud#hud", "add_score", {player = 2})
+	elseif pos.y + 8 >= window_y or pos.y - 8<= 0 then
+		self.dir.y = -self.dir.y
+		speed = speed + 2
+	end
+end
+
+function update(self, dt)
+	change_direction(self)
+	move_ball(self, dt)
+
+
+end
+
+function on_message(self, message_id, message)
+	if message_id == hash("collision_response") then
+		local other_pos = message.other_position
+		local pos = go.get_position()
+		if pos.y - 8 <= other_pos.y + 32 or pos.y + 8 >= other_pos.y - 32 then
+			self.dir.x = -self.dir.x
+			speed = speed + 2
+		else
+			self.dir.y = -self.dir.y
+		end
+	end
+end

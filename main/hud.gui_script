@@ -1,0 +1,16 @@
+local score_p1 = 0
+local score_p2 = 0
+
+function on_message(self, message_id, message)
+	if message_id == hash("add_score") then
+		if message.player == 1 then
+			score_p1 = score_p1 + 1
+			local scorenode_p1 = gui.get_node("score_p1")
+			gui.set_text(scorenode_p1, score_p1)
+		elseif message.player == 2 then
+			score_p2 = score_p2 + 1
+			local scorenode_p2 = gui.get_node("score_p2")
+			gui.set_text(scorenode_p2, score_p2)
+		end
+	end
+end

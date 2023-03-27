@@ -1,0 +1,50 @@
+go.property("player", 1)
+local speed = 250
+local _, window_y = window.get_size()
+
+local function move(self, dt)
+    local pos = go.get_position()
+    pos.y = pos.y + self.dir * speed * dt
+    go.set_position(pos)
+end
+
+local function limit_to_bounds()
+    local pos = go.get_position()
+    if pos.y + 32 >= window_y then
+        pos.y = window_y - 32
+    elseif pos.y - 32<= 0 then
+        pos.y = 32
+    end
+    go.set_position(pos)
+end
+
+function init(self)
+    msg.post(".", "acquire_input_focus")
+    self.dir = 0
+end
+
+function update(self, dt)
+    move(self, dt)
+    limit_to_bounds()
+    self.dir = 0
+end
+
+function on_input(self, action_id, action)
+    if self.player == 1 then
+        if action_id == hash("up") then
+            self.dir = 1
+        elseif action_id == hash("down") then
+            self.dir = -1
+        end
+    elseif self.player == 2 then
+        if action_id == hash("up_p2") then
+            self.dir = 1
+        elseif action_id == hash("down_p2") then
+            self.dir = -1
+        end
+    end
+end
+
+function final(self)
+    msg.post(".", "acquire_input_focus")
+end
